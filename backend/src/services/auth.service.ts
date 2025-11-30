@@ -10,13 +10,14 @@ import {
 } from "@/validations/auth.schema";
 import { comparePasswordHash, generatePasswordHash } from "@/utils/hash.utils";
 import { createJWTToken } from "@/utils/token.utils";
+import { Role } from "@/generated/prisma/enums";
 
 export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
   const { name, address, email, phone, password } = body;
 
   const existingUser = await prisma.user.findFirst({
     where: {
-      OR: [{ emailAddress: email }, { phoneNumber: phone }],
+      OR: [{ email }, { phone }],
     },
   });
 
@@ -30,10 +31,10 @@ export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
     data: {
       name,
       address,
-      emailAddress: email,
-      phoneNumber: phone,
+      email,
+      phone,
       password: hashedPassword,
-      role: "user",
+      role: Role.USER,
     },
   });
   if (!user) {
@@ -47,7 +48,7 @@ export const signInUser = async (body: LoginRequestSchema["body"]) => {
   const { email, password } = body;
 
   const user = await prisma.user.findUnique({
-    where: { emailAddress: email },
+    where: { email: email },
   });
 
   if (!user) {
@@ -72,7 +73,7 @@ export const signInUser = async (body: LoginRequestSchema["body"]) => {
   return {
     id: user.id,
     name: user.name,
-    emailAddress: user.emailAddress,
+    email: user.email,
     accessToken: accessToken,
     refreshToken: refreshToken,
   };

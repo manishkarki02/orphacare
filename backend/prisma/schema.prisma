@@ -8,67 +8,9 @@ datasource db {
 }
 
 
-enum Roles {
-  admin
-  user
-}
-
-model User {
-  id            String            @id @default(uuid())
-  name          String
-  address       String
-  email         String            @unique
-  phone         String            @unique
-  password      String
-  createdAt     DateTime          @default(now())
-  missingReport MissingReport[]
-  donaton       Donation[]
-  donatonAmount DonationAmount[]
-  role          Roles
-  adoptedKid    KidsForAdoption[]
-  adoptionReq   AdoptionRequest[]
-}
-
-model MissingReport {
-  id                   String   @id @default(uuid())
-  name                 String?
-  childLastSeenAddress String
-  childLastSeenTime    DateTime
-  childAge             Int
-  remarks              String?
-  longitude            Int
-  latitude             Int
-  image                String?
-  reporterId           String
-  reporter             User     @relation(fields: [reporterId], references: [id])
-}
-
-enum DonationType {
-  Food
-  Cloth
-  Books
-}
-
-model Donation {
-  id           String       @id @default(uuid())
-  weight       Int
-  donationType DonationType
-  donatorId    String
-  donator      User         @relation(fields: [donatorId], references: [id])
-}
-
-model DonationAmount {
-  id        String @id @default(uuid())
-  amount    Int
-  donatorId String
-  donator   User   @relation(fields: [donatorId], references: [id])
-}
-
-model Volunteer {
-  id      String  @id @default(uuid())
-  name    String
-  age     Int
-  picture String?
+enum Role {
+  ADMIN
+  USER
 }
 
 enum Caste {
@@ -78,7 +20,7 @@ enum Caste {
   Sudra
 }
 
-enum Provience {
+enum Province {
   Koshi
   Madhesh
   Bagmati
@@ -94,6 +36,64 @@ enum Gender {
   Other
 }
 
+enum DonationType {
+  Food
+  Cloth
+  Books
+}
+
+model User {
+  id            String            @id @default(uuid())
+  name          String
+  address       String
+  email         String            @unique
+  phone         String            @unique
+  password      String
+  createdAt     DateTime          @default(now())
+  missingReport MissingReport[]
+  donaton       Donation[]
+  donatonAmount DonationAmount[]
+  role          Role
+  adoptedKid    KidsForAdoption[]
+  adoptionReq   AdoptionRequest[]
+}
+
+model MissingReport {
+  id                   String   @id @default(uuid())
+  name                 String?
+  lastSeenAddress      String
+  lastSeenTime         DateTime
+  age                  Int
+  remarks              String?
+  longitude            Int
+  latitude             Int
+  image                String?
+  reporterId           String
+  reporter             User     @relation(fields: [reporterId], references: [id])
+}
+
+model Donation {
+  id           String       @id @default(uuid())
+  weight       Int
+  donationType DonationType
+  donorId      String
+  donor        User         @relation(fields: [donorId], references: [id])
+}
+
+model DonationAmount {
+  id        String @id @default(uuid())
+  amount    Int
+  donorId   String
+  donor     User   @relation(fields: [donorId], references: [id])
+}
+
+model Volunteer {
+  id      String  @id @default(uuid())
+  name    String
+  age     Int
+  picture String?
+}
+
 model KidsForAdoption {
   id          String            @id @default(uuid())
   picture     String?
@@ -102,7 +102,7 @@ model KidsForAdoption {
   age         Int
   caste       Caste
   gender      Gender
-  provience   Provience
+  province    Province
   description String
   adoptionReq AdoptionRequest[]
   isAdopted   Boolean           @default(false)
