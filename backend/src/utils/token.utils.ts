@@ -8,7 +8,7 @@ export const createJWTToken = (
   payload: TokenPayload,
   tokenType: "ACCESS_TOKEN" | "REFRESH_TOKEN"
 ) => {
-  const token = jwt.sign(payload, Environment.get(tokenType), {
+  const token = jwt.sign(payload, Environment.get(`${tokenType}_SECRET`), {
     expiresIn: Environment.get(`${tokenType}_EXPIRY`),
   });
   return token;
@@ -20,7 +20,10 @@ export function validateJWTToken(
   token: string
 ): string {
   try {
-    const decoded = jwt.verify(token, Environment.get(type)) as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      Environment.get(`${type}_SECRET`)
+    ) as JwtPayload;
 
     const id = (decoded as JwtPayload)?.userId;
     if (typeof id !== "string")

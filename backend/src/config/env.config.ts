@@ -17,22 +17,22 @@ const schema = z.object({
     .transform((val) => val.split(","))
     .pipe(z.array(z.url())),
 
-  ACCESS_TOKEN: z.string().trim().nonempty().min(10),
+  ACCESS_TOKEN_SECRET: z.string().trim().nonempty().min(10),
   ACCESS_TOKEN_EXPIRY: z.coerce
     .number()
     .positive()
     .default(0.5 * 60 * 60),
 
-  REFRESH_TOKEN: z.string().trim().nonempty().min(10),
+  REFRESH_TOKEN_SECRET: z.string().trim().nonempty().min(10),
   REFRESH_TOKEN_EXPIRY: z.coerce
     .number()
     .positive()
     .default(7 * 24 * 60 * 60),
 
-  NODE_MAILER_MAIL: z.string().trim().nonempty(),
-  NODE_MAILER_SECRET: z.string().trim().nonempty(),
-  NODE_MAILER_HOST: z.string().startsWith("smtp."),
-  NODE_MAILER_PORT: z.coerce.number(),
+  SMTP_USER: z.string().trim().nonempty(),
+  SMTP_PASS: z.string().trim().nonempty(),
+  SMTP_HOST: z.string().trim().nonempty(),
+  SMTP_PORT: z.coerce.number(),
 });
 
 // ---------------------------- DOT ENV Configurations ---------------------------- //

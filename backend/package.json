@@ -3,7 +3,16 @@
   "version": "1.0.0",
   "description": "This is backend for Orphacare application",
   "main": "dist/index.js",
-  "scripts": {},
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "biome:fix": "biome format",
+    "biome:check": "biome check",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:studio": "prisma studio"
+  },
   "keywords": [
     "nodejs",
     "express",
