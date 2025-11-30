@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+enum Roles {
+  admin
+  user
+}
+
+model User {
+  id            String            @id @default(uuid())
+  name          String
+  address       String
+  email         String            @unique
+  phone         String            @unique
+  password      String
+  createdAt     DateTime          @default(now())
+  missingReport MissingReport[]
+  donaton       Donation[]
+  donatonAmount DonationAmount[]
+  role          Roles
+  adoptedKid    KidsForAdoption[]
+  adoptionReq   AdoptionRequest[]
+}
+
+model MissingReport {
+  id                   String   @id @default(uuid())
+  name                 String?
+  childLastSeenAddress String
+  childLastSeenTime    DateTime
+  childAge             Int
+  remarks              String?
+  longitude            Int
+  latitude             Int
+  image                String?
+  reporterId           String
+  reporter             User     @relation(fields: [reporterId], references: [id])
+}
+
+enum DonationType {
+  Food
+  Cloth
+  Books
+}
+
+model Donation {
+  id           String       @id @default(uuid())
+  weight       Int
+  donationType DonationType
+  donatorId    String
+  donator      User         @relation(fields: [donatorId], references: [id])
+}
+
+model DonationAmount {
+  id        String @id @default(uuid())
+  amount    Int
+  donatorId String
+  donator   User   @relation(fields: [donatorId], references: [id])
+}
+
+model Volunteer {
+  id      String  @id @default(uuid())
+  name    String
+  age     Int
+  picture String?
+}
+
+enum Caste {
+  Brahmin
+  Kshatriya
+  Vaishya
+  Sudra
+}
+
+enum Provience {
+  Koshi
+  Madhesh
+  Bagmati
+  Gandaki
+  Lumbini
+  Karnali
+  SudurPachim
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+model KidsForAdoption {
+  id          String            @id @default(uuid())
+  picture     String?
+  name        String
+  surname     String
+  age         Int
+  caste       Caste
+  gender      Gender
+  provience   Provience
+  description String
+  adoptionReq AdoptionRequest[]
+  isAdopted   Boolean           @default(false)
+  adopterId   String?
+  adopter     User?             @relation(fields: [adopterId], references: [id])
+}
+
+model AdoptionRequest {
+  kidId     String
+  kid       KidsForAdoption @relation(fields: [kidId], references: [id])
+  adopterId String
+  adopter   User            @relation(fields: [adopterId], references: [id])
+
+  @@id([kidId, adopterId])
+}
