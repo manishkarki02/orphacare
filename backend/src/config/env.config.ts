@@ -33,6 +33,7 @@ const schema = z.object({
   SMTP_USER: z.string().trim().nonempty(),
   SMTP_PASS: z.string().trim().nonempty(),
   SMTP_HOST: z.string().trim().nonempty(),
+  SMTP_FROM: z.string().trim().nonempty(),
   SMTP_PORT: z.coerce.number(),
 });
 

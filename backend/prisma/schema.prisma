@@ -40,6 +40,7 @@ enum DonationType {
   Food
   Cloth
   Books
+  Money
 }
 
 model User {
@@ -51,8 +52,7 @@ model User {
   password      String
   createdAt     DateTime          @default(now())
   missingReport MissingReport[]
-  donaton       Donation[]
-  donatonAmount DonationAmount[]
+  donation      Donation[]
   role          Role
   adoptedKid    KidsForAdoption[]
   adoptionReq   AdoptionRequest[]
@@ -74,17 +74,11 @@ model MissingReport {
 
 model Donation {
   id           String       @id @default(uuid())
-  weight       Int
-  donationType DonationType
+  weight       Decimal?     @db.Decimal(10,2)
+  amount       Decimal?     @db.Decimal(10,2)
+  type         DonationType
   donorId      String
   donor        User         @relation(fields: [donorId], references: [id])
-}
-
-model DonationAmount {
-  id        String @id @default(uuid())
-  amount    Int
-  donorId   String
-  donor     User   @relation(fields: [donorId], references: [id])
 }
 
 model Volunteer {
