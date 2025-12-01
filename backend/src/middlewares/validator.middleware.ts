@@ -8,6 +8,7 @@ interface CombinedSchema extends ZodObject {
   body?: ZodObject;
   params?: ZodObject;
   query?: ZodObject;
+  file?: ZodObject;
 }
 
 // ---------------------------- Validation Middleware ---------------------------- //
@@ -25,7 +26,7 @@ export const validationMiddleware = (schema: CombinedSchema) => {
           new BadRequestError("Validation Error", formatError(result.error))
         );
       }
-      (["body", "params", "query"] as const).forEach((key) => {
+      (["body", "params", "query", "file"] as const).forEach((key) => {
         if (req[key]) {
           Object.defineProperty(req, key, {
             value: result.data[key],

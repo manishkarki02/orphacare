@@ -18,17 +18,17 @@ export const createJWTToken = (
 export function validateJWTToken(
   type: "ACCESS_TOKEN" | "REFRESH_TOKEN",
   token: string
-): string {
+): { userId: string; role: string } {
   try {
     const decoded = jwt.verify(
       token,
       Environment.get(`${type}_SECRET`)
     ) as JwtPayload;
 
-    const id = (decoded as JwtPayload)?.userId;
-    if (typeof id !== "string")
+    const decodedData = decoded as { userId: string; role: string };
+    if (typeof decodedData !== "object")
       throw new BadRequestError("Token payload is missing or malformed.");
-    return id;
+    return decodedData;
   } catch (err) {
     if (err instanceof jwt.TokenExpiredError) {
       throw new AuthenticationError(

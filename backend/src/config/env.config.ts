@@ -8,6 +8,7 @@ dotenv.config({
 // ---------------------------- DOT ENV Configurations Validation ---------------------------- //
 const schema = z.object({
   PORT: z.coerce.number().default(3000),
+  API_URL: z.url().trim().nonempty(),
   DATABASE_URL: z.url().nonempty(),
   SWAGGER_HOST: z.url().default("localhost:3000"),
   CORS_ORIGIN: z
