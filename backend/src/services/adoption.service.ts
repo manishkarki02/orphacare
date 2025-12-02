@@ -3,6 +3,7 @@ import { Role } from "@/generated/prisma/enums";
 import {
   AuthorizationError,
   ConflictError,
+  InternalServerError,
   NotFoundError,
 } from "@/utils/errorClass.utils";
 import {
@@ -42,6 +43,9 @@ export const createAdoptionKid = async (
       description: body.description,
     },
   });
+  if (!kid) {
+    throw new InternalServerError("Failed to create kid for adoption.");
+  }
 
   return kid;
 };
@@ -82,6 +86,9 @@ export const fetchAdoptionKidById = async (id: string) => {
     where: { id },
   });
 
+  if (!kid) {
+    throw new NotFoundError("Kid not found.");
+  }
   return kid;
 };
 
@@ -116,6 +123,10 @@ export const updateAdoptionKid = async (
       description: data.description,
     },
   });
+
+  if (!updatedKid) {
+    throw new InternalServerError("Failed to update kid for adoption.");
+  }
 
   return updatedKid;
 };
@@ -163,6 +174,10 @@ export const requestForAdoption = async (kidId: string, adopterId: string) => {
     },
     include: { kid: true, adopter: true },
   });
+
+  if (!createdAdoptionRequest) {
+    throw new InternalServerError("Failed to create adoption request.");
+  }
 
   await sendMail(
     createdAdoptionRequest.adopter.email,

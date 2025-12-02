@@ -1,5 +1,9 @@
 import prisma from "@/db";
-import { AuthorizationError, NotFoundError } from "@/utils/errorClass.utils";
+import {
+  AuthorizationError,
+  InternalServerError,
+  NotFoundError,
+} from "@/utils/errorClass.utils";
 import { CreateReportRequestSchema } from "@/validations/report.schema";
 import Environment from "@/config/env.config";
 
@@ -35,6 +39,11 @@ export const createMissingReport = async (
       image: finalImage,
     },
   });
+
+  if (!missingReport) {
+    throw new InternalServerError("Failed to create missing report.");
+  }
+
   return missingReport;
 };
 
@@ -89,7 +98,7 @@ export const fetchMyMissingReports = async (reporterId: string) => {
 };
 
 export const fetchMissingReportDetails = async (id: string) => {
-  const missingReports = await prisma.missingReport.findUnique({
+  const missingReport = await prisma.missingReport.findUnique({
     where: {
       id: id,
     },
@@ -110,7 +119,12 @@ export const fetchMissingReportDetails = async (id: string) => {
       },
     },
   });
-  return missingReports;
+
+  if (!missingReport) {
+    throw new NotFoundError("Missing report not found.");
+  }
+
+  return missingReport;
 };
 
 export const updateMissingReport = async ({
@@ -157,6 +171,10 @@ export const updateMissingReport = async ({
         : existingMissingReport.image,
     },
   });
+
+  if (!updatedMissingReport) {
+    throw new InternalServerError("Failed to update missing report.");
+  }
 
   return updatedMissingReport;
 };

@@ -4,7 +4,11 @@ import {
   UpdateDonationRequestSchema,
 } from "@/validations/donations.schema";
 import { DonationType } from "@/generated/prisma/enums";
-import { AuthorizationError, NotFoundError } from "@/utils/errorClass.utils";
+import {
+  AuthorizationError,
+  InternalServerError,
+  NotFoundError,
+} from "@/utils/errorClass.utils";
 
 // Create a donation
 export const createDonation = async (
@@ -27,6 +31,10 @@ export const createDonation = async (
   const donation = await prisma.donation.create({
     data: data,
   });
+
+  if (!donation) {
+    throw new InternalServerError("Failed to create donation.");
+  }
 
   return donation;
 };
@@ -99,6 +107,10 @@ export const fetchDonationById = async (donationId: string) => {
     },
   });
 
+  if (!donationDetail) {
+    throw new NotFoundError("Donation not found.");
+  }
+
   return donationDetail;
 };
 
@@ -135,6 +147,10 @@ export const updateDonation = async (
       weight: existingDonation.weight,
     },
   });
+
+  if (!updatedDonation) {
+    throw new InternalServerError("Failed to update donation.");
+  }
 
   return updatedDonation;
 };
