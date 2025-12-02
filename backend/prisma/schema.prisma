@@ -7,7 +7,6 @@ datasource db {
   provider = "postgresql"
 }
 
-
 enum Role {
   ADMIN
   USER
@@ -56,29 +55,35 @@ model User {
   role          Role
   adoptedKid    KidsForAdoption[]
   adoptionReq   AdoptionRequest[]
+
+  @@map("user") // map table name to lowercase
 }
 
 model MissingReport {
-  id                   String   @id @default(uuid())
-  name                 String?
-  lastSeenAddress      String
-  lastSeenTime         DateTime
-  age                  Int
-  remarks              String?
-  longitude            Int
-  latitude             Int
-  image                String?
-  reporterId           String
-  reporter             User     @relation(fields: [reporterId], references: [id])
+  id              String   @id @default(uuid())
+  name            String?
+  lastSeenAddress String
+  lastSeenTime    DateTime
+  age             Int
+  remarks         String?
+  longitude       Int
+  latitude        Int
+  image           String?
+  reporterId      String
+  reporter        User     @relation(fields: [reporterId], references: [id])
+
+  @@map("missing_report")
 }
 
 model Donation {
-  id           String       @id @default(uuid())
-  weight       Decimal?     @db.Decimal(10,2)
-  amount       Decimal?     @db.Decimal(10,2)
-  type         DonationType
-  donorId      String
-  donor        User         @relation(fields: [donorId], references: [id])
+  id      String       @id @default(uuid())
+  weight  Decimal?     @db.Decimal(10,2)
+  amount  Decimal?     @db.Decimal(10,2)
+  type    DonationType
+  donorId String
+  donor   User         @relation(fields: [donorId], references: [id])
+
+  @@map("donation")
 }
 
 model Volunteer {
@@ -86,6 +91,8 @@ model Volunteer {
   name    String
   age     Int
   picture String?
+
+  @@map("volunteer")
 }
 
 model KidsForAdoption {
@@ -102,6 +109,8 @@ model KidsForAdoption {
   isAdopted   Boolean           @default(false)
   adopterId   String?
   adopter     User?             @relation(fields: [adopterId], references: [id])
+
+  @@map("kids_for_adoption")
 }
 
 model AdoptionRequest {
@@ -111,4 +120,5 @@ model AdoptionRequest {
   adopter   User            @relation(fields: [adopterId], references: [id])
 
   @@id([kidId, adopterId])
+  @@map("adoption_request")
 }

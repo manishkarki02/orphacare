@@ -29,9 +29,9 @@ export const registerRequestSchema = z.object({
         name: nameSchema,
         email: emailSchema,
         password: passwordSchema,
-        phone: phoneSchema.optional(),
+        phone: phoneSchema,
         confirmPassword: z.string().min(1, "Confirm Password must be provided"),
-        address: addressSchema.optional(),
+        address: addressSchema,
       },
       "Request Body is required"
     )
