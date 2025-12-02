@@ -11,11 +11,13 @@ import {
   UpdateAdoptionRequestSchema,
 } from "@/validations/adoption.schema";
 import { sendMail } from "./mail.service";
+import Environment from "@/config/env.config";
 
 // Create a new kid for adoption
 export const createAdoptionKid = async (
   body: CreateAdoptionRequestSchema["body"],
-  role: string
+  role: string,
+  file: CreateAdoptionRequestSchema["file"]
 ) => {
   if (role !== Role.ADMIN) {
     throw new AuthorizationError(
@@ -23,8 +25,14 @@ export const createAdoptionKid = async (
     );
   }
 
+  let imageUrl = null;
+  if (file) {
+    imageUrl = `${Environment.get("API_URL")}/uploads/${file.filename}`;
+  }
+
   const kid = await prisma.kidsForAdoption.create({
     data: {
+      picture: imageUrl,
       name: body.name,
       surname: body.surName,
       age: body.age,
@@ -80,7 +88,8 @@ export const fetchAdoptionKidById = async (id: string) => {
 // Update a kid's details
 export const updateAdoptionKid = async (
   id: string,
-  data: UpdateAdoptionRequestSchema["body"]
+  data: UpdateAdoptionRequestSchema["body"],
+  file: UpdateAdoptionRequestSchema["file"]
 ) => {
   const existingKid = await prisma.kidsForAdoption.findUnique({
     where: { id, isAdopted: false },
@@ -89,9 +98,15 @@ export const updateAdoptionKid = async (
     throw new NotFoundError("Kid not found.");
   }
 
+  let imageUrl = null;
+  if (file) {
+    imageUrl = `${Environment.get("API_URL")}/uploads/${file.filename}`;
+  }
+
   const updatedKid = await prisma.kidsForAdoption.update({
     where: { id },
     data: {
+      picture: imageUrl,
       name: data.name,
       surname: data.surName,
       age: data.age,

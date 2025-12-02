@@ -21,7 +21,7 @@ export const createMissingReport = async (
   const user = await prisma.user.findUnique({ where: { id: reporterId } });
   if (!user) throw new NotFoundError("Reporter not found.");
 
-  const finalImage = `${Environment.get("API_URL")}/${image}`;
+  const finalImage = `${Environment.get("API_URL")}/uploads/${image}`;
   const missingReport = await prisma.missingReport.create({
     data: {
       lastSeenAddress,
@@ -153,7 +153,7 @@ export const updateMissingReport = async ({
       longitude,
       latitude,
       image: file
-        ? `${Environment.get("API_URL")}/${file.path}`
+        ? `${Environment.get("API_URL")}/uploads/${file.path}`
         : existingMissingReport.image,
     },
   });
@@ -170,7 +170,7 @@ export const deleteMissingReport = async (id: string, reporterId: string) => {
   if (!existingMissingReport) {
     throw new NotFoundError("Missing report not found.");
   }
-  
+
   if (existingMissingReport.reporterId !== reporterId) {
     throw new AuthorizationError(
       "You are not authorized to delete this missing report."

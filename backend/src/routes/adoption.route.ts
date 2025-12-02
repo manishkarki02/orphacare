@@ -8,12 +8,14 @@ import {
   fetchAdoptionRequestsSchema,
   updateAdoptionRequestSchema,
 } from "@/validations/adoption.schema";
+import { upload } from "@/config/multer.config";
 
 const router = Router();
 
 router.post(
   "/",
   accessTokenValidator,
+  upload.single("image"),
   validationMiddleware(createAdoptionRequestSchema),
   adoptionController.createAdoptionKid
 );
@@ -32,9 +34,10 @@ router.get(
   adoptionController.fetchAdoptionKidDetails
 );
 
-router.post(
+router.patch(
   "/",
   accessTokenValidator,
+  upload.single("image"),
   validationMiddleware(updateAdoptionRequestSchema),
   adoptionController.updateAdoptionKid
 );
