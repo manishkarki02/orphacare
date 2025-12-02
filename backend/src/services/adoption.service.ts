@@ -1,0 +1,158 @@
+import prisma from "@/db";
+import { Role } from "@/generated/prisma/enums";
+import {
+  AuthorizationError,
+  ConflictError,
+  NotFoundError,
+} from "@/utils/errorClass.utils";
+import {
+  CreateAdoptionRequestSchema,
+  FetchAdoptionRequestsSchema,
+  UpdateAdoptionRequestSchema,
+} from "@/validations/adoption.schema";
+import { sendMail } from "./mail.service";
+
+// Create a new kid for adoption
+export const createAdoptionKid = async (
+  body: CreateAdoptionRequestSchema["body"],
+  role: string
+) => {
+  if (role !== Role.ADMIN) {
+    throw new AuthorizationError(
+      "You are not authorized to create the kids for adoption."
+    );
+  }
+
+  const kid = await prisma.kidsForAdoption.create({
+    data: {
+      name: body.name,
+      surname: body.surName,
+      age: body.age,
+      caste: body.caste,
+      gender: body.gender,
+      province: body.province,
+      description: body.description,
+    },
+  });
+
+  return kid;
+};
+
+// Get all kids for adoption
+export const fetchAllAdoptionKids = async (
+  query: FetchAdoptionRequestsSchema["query"]
+) => {
+  let queryFilter: { [key: string]: any } = {};
+  if (query.caste) {
+    queryFilter.caste = query.caste;
+  }
+
+  if (query.gender) {
+    queryFilter.gender = query.gender;
+  }
+
+  if (query.minAge || query.maxAge) {
+    queryFilter.age = {
+      ...(query.minAge && { gte: query.minAge }),
+      ...(query.maxAge && { lte: query.maxAge }),
+    };
+  }
+
+  const kids = await prisma.kidsForAdoption.findMany({
+    where: {
+      isAdopted: false,
+      ...queryFilter,
+    },
+  });
+
+  return kids;
+};
+
+// Get a single kid by ID
+export const fetchAdoptionKidById = async (id: string) => {
+  const kid = await prisma.kidsForAdoption.findUnique({
+    where: { id },
+  });
+
+  return kid;
+};
+
+// Update a kid's details
+export const updateAdoptionKid = async (
+  id: string,
+  data: UpdateAdoptionRequestSchema["body"]
+) => {
+  const existingKid = await prisma.kidsForAdoption.findUnique({
+    where: { id, isAdopted: false },
+  });
+  if (!existingKid) {
+    throw new NotFoundError("Kid not found.");
+  }
+
+  const updatedKid = await prisma.kidsForAdoption.update({
+    where: { id },
+    data: {
+      name: data.name,
+      surname: data.surName,
+      age: data.age,
+      caste: data.caste,
+      gender: data.gender,
+      province: data.province,
+      description: data.description,
+    },
+  });
+
+  return updatedKid;
+};
+
+// Delete a kid by ID
+export const deleteAdoptionKid = async (id: string) => {
+  const existingKid = await prisma.kidsForAdoption.findUnique({
+    where: { id },
+  });
+  if (!existingKid) {
+    throw new NotFoundError("Kid not found.");
+  }
+  await prisma.kidsForAdoption.delete({
+    where: { id },
+  });
+  return;
+};
+
+// Request for adoption
+export const requestForAdoption = async (kidId: string, adopterId: string) => {
+  const existingKid = await prisma.kidsForAdoption.findUnique({
+    where: { id: kidId },
+  });
+  if (!existingKid) throw new NotFoundError("Kid not found.");
+
+  const adopter = await prisma.user.findUnique({ where: { id: adopterId } });
+  if (!adopter) throw new NotFoundError("Adopter not found.");
+
+  if (existingKid.isAdopted) {
+    throw new ConflictError("Kid is already adopted.");
+  }
+
+  const adoptionReqData = await prisma.adoptionRequest.findUnique({
+    where: { kidId_adopterId: { kidId, adopterId } },
+    include: { kid: true, adopter: true },
+  });
+
+  if (adoptionReqData) {
+    throw new ConflictError("You have already sent an adoption request.");
+  }
+  const createdAdoptionRequest = await prisma.adoptionRequest.create({
+    data: {
+      kid: { connect: { id: kidId } },
+      adopter: { connect: { id: adopterId } },
+    },
+    include: { kid: true, adopter: true },
+  });
+
+  await sendMail(
+    createdAdoptionRequest.adopter.email,
+    createdAdoptionRequest.kid.name
+  );
+
+  return createdAdoptionRequest;
+};
