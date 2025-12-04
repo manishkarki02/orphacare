@@ -15,7 +15,8 @@ export const createAdoptionKid: ValidatedRequestHandler<
 > = async (req, res) => {
   const createdKid = await adoptionService.createAdoptionKid(
     req.body,
-    res.locals.role
+    res.locals.role,
+    req.file
   );
 
   return ApiResponse.success(res, {
@@ -56,7 +57,8 @@ export const updateAdoptionKid: ValidatedRequestHandler<
 > = async (req, res) => {
   const updatedKid = await adoptionService.updateAdoptionKid(
     req.params.id,
-    req.body
+    req.body,
+    req.file
   );
 
   return ApiResponse.success(res, {
