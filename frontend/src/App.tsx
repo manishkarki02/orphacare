@@ -1,4 +1,11 @@
+import { useEffect } from "react";
+import useThemeStore from "./hooks/useThemeStore";
+
 export function App() {
+  const init = useThemeStore((state) => state.init);
+  useEffect(() => {
+    init();
+  }, []);
   return (
     <div className="w-full h-screen">
       <div className="bg-green-200 h-[100px] full-width"></div>

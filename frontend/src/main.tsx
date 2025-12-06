@@ -5,11 +5,12 @@ import { Toaster } from "sonner";
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { routeTree } from "./routeTree.gen";
+import NotFound from "./common/components/NotFound";
 
 // Router
 const router = createRouter({
   routeTree,
-  defaultNotFoundComponent: () => <div>404</div>,
+  defaultNotFoundComponent: NotFound,
 });
 export const queryClient = new QueryClient();
 declare module "@tanstack/react-query" {

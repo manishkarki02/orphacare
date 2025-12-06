@@ -1,9 +1,14 @@
 import LogoIcon from "@/components/icons/LogoIcon";
 import { Button } from "@/components/ui/button";
+import useThemeStore from "@/hooks/useThemeStore";
 import { Link, useNavigate } from "@tanstack/react-router";
+import { Moon, Sun } from "lucide-react";
+import { motion } from "motion/react";
 
 export default function NavigationBar() {
   const navigate = useNavigate();
+  const { theme, setTheme } = useThemeStore();
+
   const links = [
     {
       label: "Home",
@@ -57,6 +62,16 @@ export default function NavigationBar() {
           Sign In / Register
         </Button>
       </nav>
+      <motion.div
+        key={theme}
+        initial={{ rotate: -90, opacity: 0 }}
+        animate={{ rotate: 0, opacity: 1 }}
+        transition={{ duration: 0.25 }}
+        className="ml-4"
+        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+      >
+        {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+      </motion.div>
     </header>
   );
 }
