@@ -1,37 +1,24 @@
-import { useNavigate } from "@tanstack/react-router";
 
-const NotFound = () => {
-  const navigate = useNavigate();
-  const handleGoBack = () => {
-    window.history.back();
-  };
-  const handleNext = () => {
-    navigate({ to: "/" });
-  };
+import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
+
+export default function NotFound() {
   return (
-    <div className="flex w-full flex-col items-center justify-center gap-6 bg-gray-50">
-      <h1 className="text-5xl font-extrabold text-gray-800">404</h1>
-      <p className="text-lg text-gray-600">Page Not Found</p>
-      <div className="flex gap-4">
-        <button
-          onClick={handleGoBack}
-          className="px-6 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium 
-                 hover:bg-gray-100 hover:border-gray-400 transition-colors focus:outline-none 
-                 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-        >
-          Go Back
-        </button>
-        <button
-          onClick={handleNext}
-          className="px-6 py-2 bg-primary text-white rounded-lg border border-transparent 
-                 hover:bg-primary/90 transition-colors focus:outline-none focus:ring-2 
-                 focus:ring-primary/50 focus:ring-offset-2"
-        >
-          Home
-        </button>
+    <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6 gap-6">
+      <h1 className="text-9xl font-bold text-brand opacity-20">404</h1>
+      <div className="space-y-2 -mt-12">
+        <h2 className="text-3xl md:text-4xl font-bold text-text-dark">
+          Page Not Found
+        </h2>
+        <p className="text-lg text-text-muted text-balance max-w-md mx-auto">
+          Sorry, the page you are looking for doesn't exist or has been moved.
+        </p>
       </div>
+      <Link to="/" className="mt-4">
+        <Button className="bg-[#6366F1] hover:bg-[#5558E3] text-white font-bold px-8 py-6 rounded-xl shadow-lg transition-transform hover:scale-105">
+          Return Home
+        </Button>
+      </Link>
     </div>
   );
-};
-export default NotFound;
-
+}

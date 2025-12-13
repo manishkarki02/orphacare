@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ReportsReportIdRouteImport } from './routes/reports.$reportId'
+import { Route as ChildrenChildIdRouteImport } from './routes/children.$childId'
 import { Route as featuresVolunteersRouteImport } from './routes/(features)/volunteers'
 import { Route as featuresReportsRouteImport } from './routes/(features)/reports'
 import { Route as featuresDonationsRouteImport } from './routes/(features)/donations'
@@ -25,6 +27,16 @@ const AboutRoute = AboutRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReportsReportIdRoute = ReportsReportIdRouteImport.update({
+  id: '/reports/$reportId',
+  path: '/reports/$reportId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChildrenChildIdRoute = ChildrenChildIdRouteImport.update({
+  id: '/children/$childId',
+  path: '/children/$childId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const featuresVolunteersRoute = featuresVolunteersRouteImport.update({
@@ -61,6 +73,8 @@ export interface FileRoutesByFullPath {
   '/donations': typeof featuresDonationsRoute
   '/reports': typeof featuresReportsRoute
   '/volunteers': typeof featuresVolunteersRoute
+  '/children/$childId': typeof ChildrenChildIdRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -70,6 +84,8 @@ export interface FileRoutesByTo {
   '/donations': typeof featuresDonationsRoute
   '/reports': typeof featuresReportsRoute
   '/volunteers': typeof featuresVolunteersRoute
+  '/children/$childId': typeof ChildrenChildIdRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -80,6 +96,8 @@ export interface FileRoutesById {
   '/(features)/donations': typeof featuresDonationsRoute
   '/(features)/reports': typeof featuresReportsRoute
   '/(features)/volunteers': typeof featuresVolunteersRoute
+  '/children/$childId': typeof ChildrenChildIdRoute
+  '/reports/$reportId': typeof ReportsReportIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -91,6 +109,8 @@ export interface FileRouteTypes {
     | '/donations'
     | '/reports'
     | '/volunteers'
+    | '/children/$childId'
+    | '/reports/$reportId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -100,6 +120,8 @@ export interface FileRouteTypes {
     | '/donations'
     | '/reports'
     | '/volunteers'
+    | '/children/$childId'
+    | '/reports/$reportId'
   id:
     | '__root__'
     | '/'
@@ -109,6 +131,8 @@ export interface FileRouteTypes {
     | '/(features)/donations'
     | '/(features)/reports'
     | '/(features)/volunteers'
+    | '/children/$childId'
+    | '/reports/$reportId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -119,6 +143,8 @@ export interface RootRouteChildren {
   featuresDonationsRoute: typeof featuresDonationsRoute
   featuresReportsRoute: typeof featuresReportsRoute
   featuresVolunteersRoute: typeof featuresVolunteersRoute
+  ChildrenChildIdRoute: typeof ChildrenChildIdRoute
+  ReportsReportIdRoute: typeof ReportsReportIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +161,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reports/$reportId': {
+      id: '/reports/$reportId'
+      path: '/reports/$reportId'
+      fullPath: '/reports/$reportId'
+      preLoaderRoute: typeof ReportsReportIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/children/$childId': {
+      id: '/children/$childId'
+      path: '/children/$childId'
+      fullPath: '/children/$childId'
+      preLoaderRoute: typeof ChildrenChildIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/(features)/volunteers': {
@@ -183,6 +223,8 @@ const rootRouteChildren: RootRouteChildren = {
   featuresDonationsRoute: featuresDonationsRoute,
   featuresReportsRoute: featuresReportsRoute,
   featuresVolunteersRoute: featuresVolunteersRoute,
+  ChildrenChildIdRoute: ChildrenChildIdRoute,
+  ReportsReportIdRoute: ReportsReportIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

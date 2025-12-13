@@ -4,13 +4,13 @@
 
 :root {
   /* Colors */
-  --brand: oklch(54.921% 0.21978 290.055);
+  --brand: oklch(47.704% 0.27489 287.184);
+  --brand-hover: oklch(47.704% 0.27489 287.184);
   --primary: oklch(0.205 0 0);
-  --background-dark: oklch(92.494% 0.00011 271.152);
-  --background: oklch(1 0 0);
-  --background-light: oklch(100% 0.00011 271.152);
+  --background-body: oklch(98.463% 0.00181 249.248);
+  --background-card: oklch(100% 0.00011 271.152);
+  --text-muted: oklch(55.102% 0.02343 264.389);
   --text-dark: oklch(15.907% 0.00002 271.152);
-  --text-muted: oklch(42.024% 0.00005 271.152);
 
   /* For Grid */
   --padding-inline: 1rem;
@@ -90,11 +90,11 @@
 .dark {
   --brand: oklch(39.875% 0.21447 283.639);
   --primary: oklch(0.922 0 0);
-  --background-dark: oklch(0% 0 0);
-  --background: oklch(0.145 0 0);
+  --background-body: #111827;
+  --background-card: #1F2937;
   --background-light: oklch(21.779% 0.00002 271.152);
-  --text-dark: oklch(96.115% 0.00011 271.152);
-  --text-muted: oklch(76.676% 0.00009 271.152);
+  --text-dark: #F9FAFB;
+  --text-muted: #9CA3AF;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
@@ -129,9 +129,9 @@
 @theme inline {
   --color-brand: var(--brand);
   --color-primary: var(--primary);
-  --color-bg-dark: var(--background-dark);
-  --color-bg: var(--background);
-  --color-bg-light: var(--background-light);
+  --color-bg-body: var(--background-body);
+  /* --color-bg: var(--background); */
+  --color-bg-card: var(--background-card);
   --color-dark: var(--text-dark);
   --color-muted: var(--text-muted);
   --color-sidebar-ring: var(--sidebar-ring);

@@ -1,13 +1,16 @@
+
 import LogoIcon from "@/components/icons/LogoIcon";
 import { Button } from "@/components/ui/button";
 import useThemeStore from "@/hooks/useThemeStore";
 import { Link, useNavigate } from "@tanstack/react-router";
-import { Moon, Sun } from "lucide-react";
-import { motion } from "motion/react";
+import { Moon, Sun, Menu, X } from "lucide-react";
+import { motion, AnimatePresence } from "motion/react";
+import { useState } from "react";
 
 export default function NavigationBar() {
   const navigate = useNavigate();
   const { theme, setTheme } = useThemeStore();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const links = [
     {
@@ -15,15 +18,15 @@ export default function NavigationBar() {
       to: "/",
     },
     {
-      label: "Reports",
+      label: "Report",
       to: "/reports",
     },
     {
-      label: "Volunteers",
+      label: "Volunteer",
       to: "/volunteers",
     },
     {
-      label: "Donations",
+      label: "Donate",
       to: "/donations",
     },
     {
@@ -32,23 +35,24 @@ export default function NavigationBar() {
     },
   ];
 
+  const toggleTheme = () => setTheme(theme === "light" ? "dark" : "light");
+
   return (
-    <header className="my-8 flex items-center">
+    <header className="py-6 flex items-center justify-between sticky top-0 z-50 bg-bg-body/95 backdrop-blur supports-[backdrop-filter]:bg-bg-body/60">
       <h1 className="flex gap-2 items-center text-lg leading-tight tracking-[-0.015rem] font-bold text-dark">
-        <LogoIcon className={"size-6"} />
+        <LogoIcon className={"size-6 text-brand"} />
         <span>Orphacare</span>
       </h1>
-      <nav className="ml-auto flex items-center font-medium text-[14px]">
+
+      {/* Desktop Navigation (large screens only) */}
+      <nav className="hidden lg:flex ml-auto items-center gap-8 font-medium text-sm">
         {links.map((link) => (
           <Link
             key={link.to}
             to={link.to}
-            className="mr-4 hover:underline underline-offset-10"
+            className="hover:text-brand transition-colors text-text-muted"
             activeProps={{
-              className: "underline decoration-2 font-bold text-brand",
-            }}
-            inactiveProps={{
-              className: "text-dark",
+              className: "!text-brand font-bold",
             }}
           >
             {link.label}
@@ -56,22 +60,81 @@ export default function NavigationBar() {
         ))}
         <Button
           variant={"outline"}
-          className="hover:cursor-pointer"
+          className="ml-4 hover:cursor-pointer rounded-full px-6"
           onClick={() => navigate({ to: "/sign-in" })}
         >
           Sign In / Register
         </Button>
       </nav>
+
+      {/* Desktop Theme Toggle */}
       <motion.div
-        key={theme}
+        key={`desktop-${theme}`}
         initial={{ rotate: -90, opacity: 0 }}
         animate={{ rotate: 0, opacity: 1 }}
         transition={{ duration: 0.25 }}
-        className="ml-4"
-        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+        className="hidden lg:block ml-6 cursor-pointer text-text-muted hover:text-dark"
+        onClick={toggleTheme}
       >
         {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
       </motion.div>
+
+      {/* Mobile / Tablet Actions (hidden on large screens) */}
+      <div className="flex items-center gap-4 lg:hidden">
+        <motion.div
+            key={`mobile-${theme}`}
+            initial={{ rotate: -90, opacity: 0 }}
+            animate={{ rotate: 0, opacity: 1 }}
+            transition={{ duration: 0.25 }}
+            className="cursor-pointer text-text-muted hover:text-dark"
+            onClick={toggleTheme}
+        >
+            {theme === "light" ? <Moon size={20} /> : <Sun size={20} />}
+        </motion.div>
+        
+        <button
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="text-text-dark hover:text-brand transition-colors"
+        >
+          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Dropdown */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
+            className="absolute top-full left-0 right-0 mt-2 bg-bg-card rounded-xl border border-border shadow-xl p-6 flex flex-col gap-4 lg:hidden"
+          >
+            {links.map((link) => (
+              <Link
+                key={link.to}
+                to={link.to}
+                className="text-lg font-medium text-text-dark hover:text-brand py-2 border-b border-border/50 last:border-0"
+                activeProps={{
+                  className: "!text-brand font-bold",
+                }}
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
+            <Button
+              className="w-full mt-2 rounded-full"
+              onClick={() => {
+                navigate({ to: "/sign-in" });
+                setIsMenuOpen(false);
+              }}
+            >
+              Sign In / Register
+            </Button>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
