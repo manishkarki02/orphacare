@@ -35,6 +35,8 @@ const schema = z.object({
   SMTP_HOST: z.string().trim().nonempty(),
   SMTP_FROM: z.string().trim().nonempty(),
   SMTP_PORT: z.coerce.number(),
+
+  REDIS_URL: z.url().default("redis://localhost:6379"),
 });
 
 // ---------------------------- DOT ENV Configurations ---------------------------- //

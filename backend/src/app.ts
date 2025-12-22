@@ -8,9 +8,9 @@ const app: Application = express();
 
 // Importing custom modules
 import Environment from "./config/env.config";
-import globalErrorHandler from "./middlewares/error.middleware";
-import router from "@/routes";
-import ApiResponse from "./utils/response.utils";
+import globalErrorHandler from "./common/middlewares/error.middleware";
+import router from "@/common/routes";
+import ApiResponse from "./common/utils/response.utils";
 
 // Built-in / Imported Middlewares
 app.use(
