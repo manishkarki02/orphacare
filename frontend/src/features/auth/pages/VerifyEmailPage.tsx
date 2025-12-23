@@ -10,13 +10,7 @@ export const VerifyEmailPage = () => {
   const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
   const [message, setMessage] = useState("Verifying your email address...");
   const navigate = useNavigate();
-
-  // tanstack router useSearch cannot be used directly without a route definition with validateSearch
-  // But since we are inside the component that will be used by the route, we can use window.location or similar if not strictly typed, 
-  // or better, rely on the route definition passing search params.
-  // For simplicity in this direct component implementation (and to avoid complex type setup in this file), 
-  // we will use standard URLSearchParams for now, or expect the route to have `validateSearch`.
-  // Let's assume standard URLSearchParams for safety if strict routing isn't set up for this yet.
+  
   console.log("Window location search:", window.location.search);
   const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get("token");

@@ -5,6 +5,8 @@ import { ValidatedRequestHandler } from "@/common/types";
 import {
   LoginRequestSchema,
   RegisterRequestSchema,
+  ResendVerificationRequestSchema,
+  ResetPasswordRequestSchema,
   VerificationRequestSchema,
 } from "@/features/auth/auth.schema";
 import { clearCookie, setCookie } from "@/features/auth/utils/auth.utils";
@@ -17,18 +19,58 @@ export const signUpUser: ValidatedRequestHandler<
 
   return ApiResponse.success(res, {
     statusCode: HttpStatus.CREATED,
-    message: "User registered successfully. Please check your email for verification.",
+    message:
+      "User registered successfully. Please check your email for verification.",
   });
 };
 
-export const verifyUser: ValidatedRequestHandler<VerificationRequestSchema> = async (req, res) => {
+export const verifyUser: ValidatedRequestHandler<
+  VerificationRequestSchema
+> = async (req, res) => {
   await authService.verifyUser(req.body.email, req.body.token);
 
   return ApiResponse.success(res, {
     statusCode: HttpStatus.OK,
     message: "User verified successfully.",
-  })
-}
+  });
+};
+
+export const resendVerificationToken: ValidatedRequestHandler<
+  ResendVerificationRequestSchema
+> = async (req, res) => {
+  await authService.resendVerificationToken(req.query.email);
+
+  return ApiResponse.success(res, {
+    statusCode: HttpStatus.OK,
+    message: "Verification token sent successfully.",
+  });
+};
+
+export const forgetPassword: ValidatedRequestHandler<
+  ResendVerificationRequestSchema
+> = async (req, res) => {
+  await authService.forgetPassword(req.body.email);
+
+  return ApiResponse.success(res, {
+    statusCode: HttpStatus.OK,
+    message: "Password reset initiated. Please check your email.",
+  });
+};
+
+export const resetPassword: ValidatedRequestHandler<
+  ResetPasswordRequestSchema
+> = async (req, res) => {
+  await authService.resetPassword(
+    req.query.email,
+    req.query.token,
+    req.body.newPassword
+  );
+
+  return ApiResponse.success(res, {
+    statusCode: HttpStatus.OK,
+    message: "Password reset successfully.",
+  });
+};
 
 export const loginUser: ValidatedRequestHandler<LoginRequestSchema> = async (
   req,

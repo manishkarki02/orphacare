@@ -17,7 +17,10 @@ import {
 } from "./tokenCache.service";
 import { removeCachedUser, setCacheUser } from "./userCache.service";
 import { Role } from "@/common/types/enums";
-import { sendVerificationMail } from "@/common/services/mail.service";
+import {
+  sendResetPasswordMail,
+  sendVerificationMail,
+} from "@/common/services/mail.service";
 
 export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
   const { name, address, email, phone, password } = body;
@@ -29,6 +32,11 @@ export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
   });
 
   if (existingUser) {
+    if (!existingUser.isVerified) {
+      throw new AuthenticationError(
+        "User already registered but not verified. Please verify your email."
+      );
+    }
     throw new BadRequestError("Email or phone number already exists");
   }
 
@@ -55,7 +63,7 @@ export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
     token,
   });
 
-  await sendVerificationMail(email, token)
+  await sendVerificationMail(email, token);
 
   return user;
 };
@@ -87,6 +95,82 @@ export const verifyUser = async (userEmail: string, token: string) => {
   });
 };
 
+export const resendVerificationToken = async (userEmail: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail },
+  });
+
+  if (!user) {
+    throw new NotFoundError("User is not registered.");
+  }
+
+  if (user.isVerified) {
+    throw new BadRequestError("User is already verified.");
+  }
+
+  const token = authUtils.generateRandomToken();
+
+  await setCachedToken("verify-email", {
+    email: userEmail,
+    token,
+  });
+
+  await sendVerificationMail(userEmail, token);
+};
+
+export const forgetPassword = async (userEmail: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail },
+  });
+
+  if (!user) {
+    throw new NotFoundError("User is not registered.");
+  }
+
+  if (!user.isVerified) {
+    throw new BadRequestError("User is not verified.");
+  }
+
+  const token = authUtils.generateRandomToken();
+
+  await setCachedToken("reset-password", {
+    email: userEmail,
+    token,
+  });
+
+  await sendResetPasswordMail(userEmail, token);
+};
+
+export const resetPassword = async (
+  userEmail: string,
+  token: string,
+  newPassword: string
+) => {
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail },
+  });
+
+  if (!user) {
+    throw new NotFoundError("User is not registered.");
+  }
+
+  const cachedToken = await consumeCachedToken(
+    "reset-password",
+    userEmail,
+    token
+  );
+  if (!cachedToken) {
+    throw new BadRequestError("Invalid or expired password reset token.");
+  }
+
+  const hashedPassword = await authUtils.generatePasswordHash(newPassword);
+
+  await prisma.user.update({
+    where: { email: userEmail },
+    data: { password: hashedPassword },
+  });
+};
+
 export const signInUser = async (body: LoginRequestSchema["body"]) => {
   const { email, password } = body;
 
@@ -100,6 +184,12 @@ export const signInUser = async (body: LoginRequestSchema["body"]) => {
 
   if (!(await authUtils.comparePasswordHash(password, user.password))) {
     throw new AuthenticationError("Invalid email address or password");
+  }
+
+  if (!user.isVerified) {
+    throw new AuthenticationError(
+      "User is not verified. Please verify your email."
+    );
   }
 
   // Create JWT token

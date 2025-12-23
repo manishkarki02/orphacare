@@ -27,6 +27,8 @@ export const SignInForm = () => {
   const {
     register,
     handleSubmit,
+    setError,
+    getValues,
     formState: { errors },
   } = useForm<SignInValues>({
     resolver: zodResolver(signInSchema as any),
@@ -35,6 +37,25 @@ export const SignInForm = () => {
       password: "",
     },
   });
+
+  const handleResendVerification = async () => {
+      const email = getValues("email");
+      if(!email) {
+          toast.error("Please enter your email to resend verification.");
+          return;
+      }
+      
+      setIsLoading(true);
+      try {
+          await api.get(`/auth/resend-verification?email=${email}`);
+          toast.success("Verification email sent successfully.");
+      } catch (error: any) {
+           console.error(error);
+           toast.error(error.response?.data?.message || "Failed to resend verification email.");
+      } finally {
+          setIsLoading(false);
+      }
+  }
 
   const onSubmit = async (data: SignInValues) => {
     setIsLoading(true);
@@ -54,6 +75,13 @@ export const SignInForm = () => {
       console.error(error);
       const message = error.response?.data?.message || "Failed to sign in";
       toast.error(message);
+      
+      if (message.includes("not verified")) {
+          setError("root.serverError", { 
+              type: "unverified",
+              message: message 
+          });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -122,6 +150,22 @@ export const SignInForm = () => {
           Sign up
         </Link>
       </div>
+
+      {errors.root?.serverError && (
+         <div className="text-center">
+            {errors.root.serverError.type === "unverified" && (
+                <Button
+                    type="button"
+                    variant="link"
+                    className="text-red-500 underline"
+                    onClick={handleResendVerification}
+                    disabled={isLoading}
+                >
+                    Resend Verification Email
+                </Button>
+            )}
+         </div>
+      )}
     </form>
   );
 };

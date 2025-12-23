@@ -2,6 +2,8 @@ import { validationMiddleware } from "@/common/middlewares/validator.middleware"
 import {
   loginRequestSchema,
   registerRequestSchema,
+  resendVerificationRequestSchema,
+  resetPasswordRequestSchema,
   verificationRequestSchema,
 } from "@/features/auth/auth.schema";
 import * as authController from "@/features/auth/auth.controller";
@@ -97,7 +99,36 @@ router.post(
   "/verify",
   validationMiddleware(verificationRequestSchema),
   catchAsync(authController.verifyUser)
-)
+);
+
+/**
+ * @swagger
+ * /auth/resend-verification:
+ *   get:
+ *     summary: Resend verification email
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User's email address
+ *     responses:
+ *       200:
+ *         description: Verification email sent successfully
+ *       400:
+ *         description: Validation error or user already verified
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  "/resend-verification",
+  validationMiddleware(resendVerificationRequestSchema),
+  catchAsync(authController.resendVerificationToken)
+);
 
 /**
  * @swagger
@@ -163,6 +194,80 @@ router.post(
   "/signout",
   accessTokenValidator,
   catchAsync(authController.logoutUser)
+);
+
+/**
+ * @swagger
+ * /auth/forget-password:
+ *   get:
+ *     summary: Request password reset link
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User's email address
+ *     responses:
+ *       200:
+ *         description: Reset password email sent successfully
+ *       400:
+ *         description: Validation error
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get(
+  "/forget-password",
+  validationMiddleware(resendVerificationRequestSchema),
+  catchAsync(authController.forgetPassword)
+);
+
+/**
+ * @swagger
+ * /auth/reset-password:
+ *   post:
+ *     summary: Reset user password
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: email
+ *         required: true
+ *         schema:
+ *           type: string
+ *       - in: query
+ *         name: token
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - newPassword
+ *               - confirmNewPassword
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *               confirmNewPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Password reset successfully
+ *       400:
+ *         description: Validation error or invalid token
+ *       500:
+ *         description: Internal server error
+ */
+router.post(
+  "/reset-password",
+  validationMiddleware(resetPasswordRequestSchema),
+  catchAsync(authController.resetPassword)
 );
 
 export default router;

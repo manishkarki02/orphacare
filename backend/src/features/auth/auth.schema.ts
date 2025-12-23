@@ -45,8 +45,31 @@ export const verificationRequestSchema = z.object({
   body: z.object({
     email: emailSchema,
     token: z.string(),
-  })
-})
+  }),
+});
+
+export const resendVerificationRequestSchema = z.object({
+  query: z.object({
+    email: emailSchema,
+  }),
+});
+
+export const resetPasswordRequestSchema = z.object({
+  query: z.object({
+    email: emailSchema,
+    token: z.string(),
+  }),
+  body: z
+    .object({
+      newPassword: passwordSchema,
+      confirmNewPassword: z
+        .string()
+        .min(1, "Confirm New Password must be provided"),
+    })
+    .refine((data) => data.newPassword === data.confirmNewPassword, {
+      message: "New Password and Confirm New Password do not match",
+    }),
+});
 
 export const loginRequestSchema = z.object({
   body: z.object(
@@ -59,5 +82,13 @@ export const loginRequestSchema = z.object({
 });
 
 export type RegisterRequestSchema = z.infer<typeof registerRequestSchema>;
-export type VerificationRequestSchema = z.infer<typeof verificationRequestSchema>;
+export type VerificationRequestSchema = z.infer<
+  typeof verificationRequestSchema
+>;
+export type ResendVerificationRequestSchema = z.infer<
+  typeof resendVerificationRequestSchema
+>;
+export type ResetPasswordRequestSchema = z.infer<
+  typeof resetPasswordRequestSchema
+>;
 export type LoginRequestSchema = z.infer<typeof loginRequestSchema>;
