@@ -5,6 +5,7 @@ import { ValidatedRequestHandler } from "@/common/types";
 import {
   LoginRequestSchema,
   RegisterRequestSchema,
+  VerificationRequestSchema,
 } from "@/features/auth/auth.schema";
 import { clearCookie, setCookie } from "@/features/auth/utils/auth.utils";
 import Environment from "@/config/env.config";
@@ -16,9 +17,18 @@ export const signUpUser: ValidatedRequestHandler<
 
   return ApiResponse.success(res, {
     statusCode: HttpStatus.CREATED,
-    message: "User created successfully.",
+    message: "User registered successfully. Please check your email for verification.",
   });
 };
+
+export const verifyUser: ValidatedRequestHandler<VerificationRequestSchema> = async (req, res) => {
+  await authService.verifyUser(req.body.email, req.body.token);
+
+  return ApiResponse.success(res, {
+    statusCode: HttpStatus.OK,
+    message: "User verified successfully.",
+  })
+}
 
 export const loginUser: ValidatedRequestHandler<LoginRequestSchema> = async (
   req,

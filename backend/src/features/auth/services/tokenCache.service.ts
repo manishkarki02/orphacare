@@ -1,5 +1,5 @@
 import Environment from "@/config/env.config";
-import { sha256 } from "../utils/auth.utils";
+import { sha256, timeSafeCompare } from "../utils/auth.utils";
 import redisClient from "@/config/redis.config";
 type CachedTokenType = "reset-password" | "verify-email" | "refresh-token";
 
@@ -20,11 +20,12 @@ const TOKEN_CONFIG = {
 
 export const setCachedToken = async (
   type: CachedTokenType,
-  payload: { email?: string; token: string }
+  payload: { email?: string; token: string; userId?: string }
 ) => {
   const config = TOKEN_CONFIG[type];
   if (type === "refresh-token") {
-    await redisClient.set(config.key(payload.token), 1, {
+    // Store userId as the value for the refresh token key
+    await redisClient.set(config.key(payload.token), payload.userId || "1", {
       expiration: {
         type: "EX",
         value: config.expiry,
@@ -49,8 +50,18 @@ export const getCachedToken = async (type: CachedTokenType, key: string) => {
 
 export const consumeCachedToken = async (
   type: CachedTokenType,
-  key: string
+  key: string,
+  token?: string
 ) => {
-  const config = TOKEN_CONFIG[type];
-  await redisClient.del(config.key(key));
+  if (type === "refresh-token") {
+    const existed = await redisClient.del(
+      TOKEN_CONFIG["refresh-token"].key(key)
+    );
+    return existed === 1;
+  }
+  if (!token) return false;
+  const storedHash = await redisClient.getDel(TOKEN_CONFIG[type].key(key));
+  if (!storedHash) return false;
+
+  return timeSafeCompare(storedHash, sha256(token));
 };

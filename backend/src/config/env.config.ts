@@ -10,6 +10,7 @@ const schema = z.object({
   PORT: z.coerce.number().default(3000),
   API_URL: z.url().trim().nonempty(),
   DATABASE_URL: z.url().nonempty(),
+  FRONTEND_URL: z.url().default("http://localhost:5173"),
   SWAGGER_HOST: z.url().default("localhost:3000"),
   CORS_ORIGIN: z
     .string()

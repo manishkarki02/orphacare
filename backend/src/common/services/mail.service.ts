@@ -25,3 +25,37 @@ export const sendMail = async (email: string, childName: string) => {
     return false;
   }
 };
+
+export const sendVerificationMail = async (email: string, token: string) => {
+  try {
+    const verificationLink = `${Environment.get("FRONTEND_URL")}/verify-email?token=${token}&email=${email}`;
+
+    let info = await transporter.sendMail({
+      from: Environment.get("SMTP_FROM"),
+      to: email,
+      subject: "Verify your email address",
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 10px;">
+          <h2 style="color: #333; text-align: center;">Welcome to OrphaCare</h2>
+          <p style="color: #555; font-size: 16px;">
+            Thank you for registering with us. To complete your registration and verify your account, please click the button below:
+          </p>
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${verificationLink}" style="background-color: #007bff; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; font-size: 16px;">Verify Email Address</a>
+          </div>
+          <p style="color: #999; font-size: 14px; text-align: center;">
+            If the button doesn't work, verify using this link: <br>
+            <a href="${verificationLink}" style="color: #007bff;">${verificationLink}</a>
+          </p>
+          <p style="color: #999; font-size: 12px; text-align: center; margin-top: 20px;">
+            This link will expire in 5 minutes.
+          </p>
+        </div>
+      `,
+    });
+    return info;
+  } catch (error) {
+    console.error("Error sending verification email:", error);
+    return false;
+  }
+};

@@ -3,6 +3,7 @@ import {
   AuthenticationError,
   BadRequestError,
   InternalServerError,
+  NotFoundError,
 } from "@/common/utils/errorClass.utils";
 import {
   LoginRequestSchema,
@@ -16,6 +17,7 @@ import {
 } from "./tokenCache.service";
 import { removeCachedUser, setCacheUser } from "./userCache.service";
 import { Role } from "@/common/types/enums";
+import { sendVerificationMail } from "@/common/services/mail.service";
 
 export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
   const { name, address, email, phone, password } = body;
@@ -46,7 +48,43 @@ export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
     throw new InternalServerError("Failed to create user");
   }
 
+  const token = authUtils.generateRandomToken();
+
+  await setCachedToken("verify-email", {
+    email,
+    token,
+  });
+
+  await sendVerificationMail(email, token)
+
   return user;
+};
+
+export const verifyUser = async (userEmail: string, token: string) => {
+  const user = await prisma.user.findUnique({
+    where: { email: userEmail },
+  });
+  if (!user) {
+    throw new NotFoundError("User is not registered.");
+  }
+
+  if (user.isVerified) {
+    throw new BadRequestError("User is already verified.");
+  }
+
+  const cachedToken = await consumeCachedToken(
+    "verify-email",
+    userEmail,
+    token
+  );
+  if (!cachedToken) {
+    throw new BadRequestError("Invalid or expired verification token.");
+  }
+
+  await prisma.user.update({
+    where: { email: userEmail },
+    data: { isVerified: true },
+  });
 };
 
 export const signInUser = async (body: LoginRequestSchema["body"]) => {
@@ -71,7 +109,10 @@ export const signInUser = async (body: LoginRequestSchema["body"]) => {
   });
   const refreshToken = authUtils.generateRandomToken();
 
-  await setCachedToken("refresh-token", { token: refreshToken });
+  await setCachedToken("refresh-token", {
+    token: refreshToken,
+    userId: user.id,
+  });
   await setCacheUser({
     id: user.id,
     name: user.name,

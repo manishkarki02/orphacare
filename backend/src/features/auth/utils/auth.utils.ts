@@ -6,7 +6,7 @@ import {
   AuthenticationError,
   BadRequestError,
 } from "@/common/utils/errorClass.utils";
-import { createHash, randomBytes } from "crypto";
+import { createHash, randomBytes, timingSafeEqual } from "crypto";
 
 const saltRounds = 10;
 type TokenPayload = { userId: string; role: string };
@@ -66,6 +66,13 @@ export const generateRandomToken = () => {
 
 export const sha256 = (token: string) => {
   return createHash("sha256").update(token).digest("hex");
+};
+
+export const timeSafeCompare = (hashA: string, hashB: string): boolean => {
+  const bufferA = Buffer.from(hashA, "hex");
+  const bufferB = Buffer.from(hashB, "hex");
+
+  return timingSafeEqual(bufferA, bufferB);
 };
 
 // ---------------------------- JWT Utilities ---------------------------- //

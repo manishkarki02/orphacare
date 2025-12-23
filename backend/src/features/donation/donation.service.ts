@@ -29,7 +29,7 @@ export const createDonation = async (
         };
 
   const donation = await prisma.donation.create({
-    data: data,
+    data: data as any,
   });
 
   if (!donation) {

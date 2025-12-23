@@ -2,6 +2,7 @@ import { validationMiddleware } from "@/common/middlewares/validator.middleware"
 import {
   loginRequestSchema,
   registerRequestSchema,
+  verificationRequestSchema,
 } from "@/features/auth/auth.schema";
 import * as authController from "@/features/auth/auth.controller";
 import { Router } from "express";
@@ -62,6 +63,41 @@ router.post(
   validationMiddleware(registerRequestSchema),
   catchAsync(authController.signUpUser)
 );
+
+/**
+ * @swagger
+ * /auth/verify:
+ *   post:
+ *     summary: Verify user email
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - email
+ *               - token
+ *             properties:
+ *               email:
+ *                 type: string
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: User verified successfully
+ *       400:
+ *         description: Invalid token or email
+ *       500:
+ *         description: Internal server error
+ */
+
+router.post(
+  "/verify",
+  validationMiddleware(verificationRequestSchema),
+  catchAsync(authController.verifyUser)
+)
 
 /**
  * @swagger

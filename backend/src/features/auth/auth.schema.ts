@@ -41,6 +41,13 @@ export const registerRequestSchema = z.object({
     }),
 });
 
+export const verificationRequestSchema = z.object({
+  body: z.object({
+    email: emailSchema,
+    token: z.string(),
+  })
+})
+
 export const loginRequestSchema = z.object({
   body: z.object(
     {
@@ -52,4 +59,5 @@ export const loginRequestSchema = z.object({
 });
 
 export type RegisterRequestSchema = z.infer<typeof registerRequestSchema>;
+export type VerificationRequestSchema = z.infer<typeof verificationRequestSchema>;
 export type LoginRequestSchema = z.infer<typeof loginRequestSchema>;

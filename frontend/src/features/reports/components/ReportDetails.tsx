@@ -36,8 +36,6 @@ export default function ReportDetails({
   height,
   weight,
   remarks,
-  lat,
-  lng,
 }: ReportDetailsProps) {
   const [isLoading, setIsLoading] = useState(true);
 

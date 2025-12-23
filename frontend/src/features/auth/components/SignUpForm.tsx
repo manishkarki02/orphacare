@@ -57,8 +57,8 @@ export const SignUpForm = () => {
   const onSubmit = async (data: SignUpValues) => {
     setIsLoading(true);
     try {
-      await api.post("/auth/signup", data);
-      toast.success("Account created successfully. Please sign in.");
+      const response = await api.post("/auth/signup", data);
+      toast.success(response.data.message || "Account created successfully. Please check your email.");
       navigate({ to: "/sign-in" }); // Using sign-in route instead of signin
     } catch (error: any) {
       console.error(error);

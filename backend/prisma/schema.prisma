@@ -49,6 +49,7 @@ model User {
   email         String            @unique
   phone         String            @unique
   password      String
+  isVerified    Boolean           @default(false)
   createdAt     DateTime          @default(now())
   missingReport MissingReport[]
   donation      Donation[]

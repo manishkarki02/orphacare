@@ -1,6 +1,6 @@
 import { useAuthStore } from "@/store/auth-store";
 import { Navigate, Outlet } from "@tanstack/react-router";
-import { ReactNode } from "react";
+import type { ReactNode } from "react";
 
 interface ProtectedRouteProps {
   children?: ReactNode;

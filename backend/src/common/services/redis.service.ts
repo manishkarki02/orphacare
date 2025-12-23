@@ -3,7 +3,7 @@ import redis from "redis";
 
 class Redis {
   static instance: Redis;
-  private client: redis.RedisClientType;
+  private client!: redis.RedisClientType;
 
   constructor() {
     if (Redis.instance) {
