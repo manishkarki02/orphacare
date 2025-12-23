@@ -11,6 +11,8 @@ import Environment from "./config/env.config";
 import globalErrorHandler from "./common/middlewares/error.middleware";
 import router from "@/common/routes";
 import ApiResponse from "./common/utils/response.utils";
+import swaggerUi from "swagger-ui-express";
+import swaggerSpec from "@/config/swagger.config";
 
 // Built-in / Imported Middlewares
 app.use(
@@ -37,6 +39,7 @@ app.use("/uploads", express.static("uploads"));
 
 // Routing
 app.use("/api", router);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((_req, res) => {
   ApiResponse.error(res, {
     statusCode: HttpStatus.NOT_FOUND,

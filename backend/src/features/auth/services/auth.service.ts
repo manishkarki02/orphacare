@@ -9,8 +9,12 @@ import {
   RegisterRequestSchema,
 } from "@/features/auth/auth.schema";
 import * as authUtils from "@/features/auth/utils/auth.utils";
-import { setCachedToken } from "./tokenCache.service";
-import { setCacheUser } from "./userCache.service";
+import {
+  consumeCachedToken,
+  getCachedToken,
+  setCachedToken,
+} from "./tokenCache.service";
+import { removeCachedUser, setCacheUser } from "./userCache.service";
 import { Role } from "@/common/types/enums";
 
 export const signUpUser = async (body: RegisterRequestSchema["body"]) => {
@@ -84,4 +88,18 @@ export const signInUser = async (body: LoginRequestSchema["body"]) => {
     accessToken: accessToken,
     refreshToken: refreshToken,
   };
+};
+
+export const signOutUser = async (userId: string, refreshToken: string) => {
+  if (!refreshToken) {
+    return;
+  }
+
+  const cachedToken = await getCachedToken("refresh-token", refreshToken);
+  if (!cachedToken) {
+    throw new AuthenticationError("Invalid refresh token");
+  }
+
+  await consumeCachedToken("refresh-token", refreshToken);
+  await removeCachedUser(userId);
 };

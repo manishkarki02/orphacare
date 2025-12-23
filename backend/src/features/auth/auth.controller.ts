@@ -6,7 +6,7 @@ import {
   LoginRequestSchema,
   RegisterRequestSchema,
 } from "@/features/auth/auth.schema";
-import { setCookie } from "@/features/auth/utils/auth.utils";
+import { clearCookie, setCookie } from "@/features/auth/utils/auth.utils";
 import Environment from "@/config/env.config";
 
 export const signUpUser: ValidatedRequestHandler<
@@ -37,5 +37,17 @@ export const loginUser: ValidatedRequestHandler<LoginRequestSchema> = async (
     statusCode: HttpStatus.OK,
     message: "Login successful.",
     data: responseData,
+  });
+};
+
+export const logoutUser: ValidatedRequestHandler = async (req, res) => {
+  const refreshToken = req.cookies["REFRESH_TOKEN"];
+
+  await authService.signOutUser(res.locals.userId, refreshToken);
+  clearCookie(res, "REFRESH_TOKEN", "/refresh");
+
+  return ApiResponse.success(res, {
+    statusCode: HttpStatus.OK,
+    message: "Logout successful.",
   });
 };

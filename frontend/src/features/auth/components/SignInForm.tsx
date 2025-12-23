@@ -40,10 +40,10 @@ export const SignInForm = () => {
     setIsLoading(true);
     try {
       const response = await api.post("/auth/signin", data);
-      const { user, accessToken, refreshToken } = response.data.data;
+      const { id, name, email, accessToken, refreshToken } = response.data.data;
       
       login(
-          { id: user.id, name: user.name, email: user.email, role: user.role ?? "USER" },
+          { id: id, name: name, email: email, role: "USER" },
           accessToken, 
           refreshToken
       );
@@ -118,7 +118,7 @@ export const SignInForm = () => {
 
       <div className="text-center text-text-muted">
         Don&apos;t have an account?{" "}
-        <Link to="/signup" className="text-[#6366F1] font-bold hover:underline">
+        <Link to="/sign-up" className="text-[#6366F1] font-bold hover:underline">
           Sign up
         </Link>
       </div>
