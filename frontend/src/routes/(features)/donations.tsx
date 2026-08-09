@@ -1,4 +1,6 @@
+// TODO: Update these imports to `@/features/donations/...`.
 import DonationForm from "@/features/donation/components/DonationForm";
+// TODO: The existing skeleton file is named `DonationsPageSkeleton.tsx`.
 import DonationPageSkeleton from "@/features/donation/components/DonationPageSkeleton";
 import ImpactSidebar from "@/features/donation/components/ImpactSidebar";
 import { createFileRoute } from "@tanstack/react-router";

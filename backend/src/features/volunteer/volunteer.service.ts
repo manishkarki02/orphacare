@@ -9,6 +9,7 @@ export const getAllVolunteers = async () => {
 		select: {
 			id: true,
 			name: true,
+			// TODO: Replace `age` with a field that exists on the Prisma User model, or add age to the schema.
 			age: true,
 			picture: true,
 		},
@@ -24,6 +25,7 @@ export const getVolunteerById = async (id: string) => {
 		select: {
 			id: true,
 			name: true,
+			// TODO: Replace `age` with a field that exists on the Prisma User model, or add age to the schema.
 			age: true,
 			picture: true,
 		},
@@ -58,6 +60,7 @@ export const updateVolunteer = async (
 		where: { id },
 		data: {
 			name: data.name,
+			// TODO: Replace `age` with a field that exists on the Prisma User model, or add age to the schema.
 			age: data.age,
 			picture: imageUrl,
 		},

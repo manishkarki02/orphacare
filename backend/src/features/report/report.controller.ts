@@ -49,6 +49,7 @@ export const getMyMissingReports: ValidatedRequestHandler = async (_req, res) =>
 
 //getting a single missing report by id
 export const getMissingReportDetails: ValidatedRequestHandler = async (req, res) => {
+	// TODO: Narrow `req.params.id` to a string before passing it to the report service.
 	const missingReportDetail = await reportService.getMissingReportDetails(req.params.id);
 
 	return successResponse(res, {
@@ -65,6 +66,7 @@ export const updateMissingReport: ValidatedRequestHandler = async (req, res) => 
 	}
 
 	const updatedMissingReport = await reportService.updateMissingReport({
+		// TODO: Narrow `req.params.id` to a string before assigning it here.
 		id: req.params.id,
 		body: req.body,
 		file: req.file,
@@ -80,6 +82,7 @@ export const updateMissingReport: ValidatedRequestHandler = async (req, res) => 
 
 // deleting a missing report
 export const deleteMissingReport: ValidatedRequestHandler = async (req, res) => {
+	// TODO: Narrow `req.params.id` to a string before passing it to the report service.
 	await reportService.deleteMissingReport(req.params.id, res.locals.userId);
 
 	return successResponse(res, {
