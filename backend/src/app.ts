@@ -35,6 +35,10 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/uploads", express.static("uploads"));
 
 // Routing
+app.get("/health", (_req, res) => {
+	res.status(HttpStatus.OK).json({ status: "ok" });
+});
+
 app.use("/api", router);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use((_req, res) => {

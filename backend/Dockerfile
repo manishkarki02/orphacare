@@ -50,6 +50,10 @@ CMD ["pnpm", "dev"]
 # ==================================================
 FROM deps AS build
 
+ARG DIRECT_URL=postgresql://postgres:postgres@localhost:5432/postgres
+
+ENV DIRECT_URL="${DIRECT_URL}"
+
 COPY . .
 
 RUN pnpm prisma:generate
@@ -92,6 +96,9 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 RUN apk add --no-cache dumb-init
+
+RUN mkdir -p /app/uploads \
+    && chown -R node:node /app/uploads
 
 COPY --from=prod-deps \
     --chown=node:node \

@@ -40,11 +40,9 @@ jobs:
             - name: Setup node
               uses: actions/setup-node@v6
               with:
-                # TODO: Use `node-version`; `version` is not the setup-node input for selecting Node.
-                version: 22.18.0
+                node-version: 22.18.0
                 cache: pnpm
-                # TODO: Use `cache-dependency-path` and point it at `frontend/pnpm-lock.yaml`.
-                cache_dependency_path: frontend/pnpm-lock.yml
+                cache-dependency-path: frontend/pnpm-lock.yaml
 
             - name: Install dependencies
               run: pnpm install --frozen-lockfile
@@ -52,20 +50,13 @@ jobs:
             - name: Run TypeCheck
               run: pnpm exec tsc --noEmit
 
+            - name: Run lint
+              run: pnpm lint
+
+            - name: Run tests
+              run: pnpm test
+
             - name: Build
+              env:
+                VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
               run: pnpm build
-
-            - name: Setup Docker Buildx
-              uses: docker/setup-buildx-action@v3
-
-            - name: Validate production image
-              uses: docker/build-push-action@v6
-              with:
-                context: ./frontend
-                # TODO: Add `frontend/Dockerfile` or remove this Docker validation step.
-                file: ./frontend/Dockerfile
-                target: production
-                push: false
-                tags: orpha-care-frontend:ci
-                cache-from: type=gha,scope=frontend
-                cache-to: type=gha,mode=max,scope=frontend

@@ -19,6 +19,10 @@ jobs:
     publish:
         name: Publish Docker Images
 
+        needs:
+            - backend-ci
+            - frontend-ci
+
         runs-on: ubuntu-latest
 
         permissions:
@@ -58,15 +62,34 @@ jobs:
               uses: docker/build-push-action@v6
               with:
                 context: ./backend
-                file: ./backend/Docker
-                target: production
+                file: ./backend/Dockerfile
+                target: migration
                 push: true
 
                 tags: |
                     ghcr.io/${{ github.repository_owner }}/orpha-care-migration:${{ github.sha }}
+                    ghcr.io/${{ github.repository_owner }}/orpha-care-migration:latest
 
                 cache-from: type=gha,scope=migration
                 cache-to: type=gha,mode=max,scope=migration
+
+            - name: Frontend Build and push
+              uses: docker/build-push-action@v6
+              with:
+                context: ./frontend
+                file: ./frontend/Dockerfile
+                target: production
+                push: true
+
+                build-args: |
+                    VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+
+                tags: |
+                    ghcr.io/${{ github.repository_owner }}/orpha-care-frontend:${{ github.sha }}
+                    ghcr.io/${{ github.repository_owner }}/orpha-care-frontend:latest
+
+                cache-from: type=gha,scope=frontend
+                cache-to: type=gha,mode=max,scope=frontend
     
     deploy:
         name: Deploy Production
@@ -98,7 +121,52 @@ jobs:
 
             - name: Update production compose
               run: |
-                cp docker-compose.prod.yml /opt/orpha-care/docker-compose.prod.yml
+                mkdir -p /opt/orpha-care
+                cp backend/docker-compose-prod.yml /opt/orpha-care/docker-compose-prod.yml
 
+            - name: Pull Image
+              working-directory: /opt/orpha-care
+
+              env:
+                IMAGE_TAG: ${{ github.sha }}
+                GHCR_OWNER: ${{ github.repository_owner }}
             
-            
+              run: |
+                export IMAGE_TAG GHCR_OWNER
+
+                docker compose \
+                    --env-file .env.production \
+                    -f docker-compose-prod.yml \
+                    pull
+
+            - name: Deploy
+              working-directory: /opt/orpha-care
+              env:
+                IMAGE_TAG: ${{ github.sha }}
+                GHCR_OWNER: ${{ github.repository_owner }}
+              run: |
+                export IMAGE_TAG GHCR_OWNER
+
+                docker compose \
+                    --env-file .env.production \
+                    -f docker-compose-prod.yml \
+                    up -d --remove-orphans
+
+            - name: Verify Backend
+              run: |
+                for i in $(seq 1 20); do
+                    if curl --fail --silent http://localhost:8000/health; then
+                        exit 0;
+                    fi
+
+                    sleep 3
+                done
+
+                echo "Backend health check"
+
+                docker compose \
+                    --env-file /opt/orpha-care/.env.production \
+                    -f /opt/orpha-care/docker-compose-prod.yml \
+                    logs backend
+
+                exit 1
