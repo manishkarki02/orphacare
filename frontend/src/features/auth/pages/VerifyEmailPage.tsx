@@ -5,23 +5,29 @@ import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
+import { AxiosError } from "axios";
 
 export const VerifyEmailPage = () => {
-  const [status, setStatus] = useState<"loading" | "success" | "error">("loading");
-  const [message, setMessage] = useState("Verifying your email address...");
-  const navigate = useNavigate();
-  
-  console.log("Window location search:", window.location.search);
   const searchParams = new URLSearchParams(window.location.search);
   const token = searchParams.get("token");
   const email = searchParams.get("email");
+  const hasVerificationDetails = Boolean(token && email);
+  const [status, setStatus] = useState<"loading" | "success" | "error">(
+    hasVerificationDetails ? "loading" : "error",
+  );
+  const [message, setMessage] = useState(
+    hasVerificationDetails
+      ? "Verifying your email address..."
+      : "Invalid verification link. Missing token or email.",
+  );
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!token || !email) {
-      setStatus("error");
-      setMessage("Invalid verification link. Missing token or email.");
       return;
     }
+
+    let redirectTimer: ReturnType<typeof setTimeout> | undefined;
 
     const verify = async () => {
       try {
@@ -31,21 +37,26 @@ export const VerifyEmailPage = () => {
         toast.success("Email verified successfully");
         
         // Redirect after a short delay
-        setTimeout(() => {
+        redirectTimer = setTimeout(() => {
           navigate({ to: "/sign-in" });
         }, 3000);
-      } catch (error: any) {
-        console.error("Verification failed:", error);
-        console.log("Error response data")
+      } catch (error: unknown) {
         setStatus("error");
         setMessage(
-          error.response?.data?.message || "Verification failed. Please try again."
+          error instanceof AxiosError &&
+            typeof error.response?.data?.message === "string"
+            ? error.response.data.message
+            : "Verification failed. Please try again.",
         );
         toast.error("Verification failed");
       }
     };
 
-    verify();
+    void verify();
+
+    return () => {
+      if (redirectTimer) clearTimeout(redirectTimer);
+    };
   }, [token, email, navigate]);
 
   return (
