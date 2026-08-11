@@ -3,8 +3,7 @@ import type { ApiResponse } from "@/lib/types";
 import type {
   CreateDonationPayload,
   Donation,
-  // TODO: Update this import path to `@/features/donations/types`.
-} from "@/features/donation/types";
+} from "@/features/donations/types";
 
 export const createDonation = async (
   payload: CreateDonationPayload,

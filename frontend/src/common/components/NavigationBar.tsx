@@ -41,7 +41,7 @@ export default function NavigationBar() {
     },
     {
       label: "Donate",
-      to: "/donation",
+      to: "/donations",
     },
     {
       label: "About",

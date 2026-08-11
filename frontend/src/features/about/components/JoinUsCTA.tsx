@@ -13,7 +13,7 @@ export default function JoinUsCTA() {
         </h2>
 
         <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-          <Link to="/donation" className="w-full sm:w-auto">
+          <Link to="/donations" className="w-full sm:w-auto">
             <Button className="bg-white text-[#6366F1] hover:bg-gray-100 font-bold py-6 px-10 text-lg rounded-xl shadow-lg w-full">
               Donate Now
             </Button>

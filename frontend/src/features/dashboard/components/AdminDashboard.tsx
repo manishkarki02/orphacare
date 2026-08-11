@@ -3,8 +3,7 @@ import { getPendingAdoptionRequests } from "@/features/adoption/api";
 import { getChildren } from "@/features/children/api";
 import { getReports } from "@/features/reports/api";
 import { getVolunteers } from "@/features/volunteers/api";
-// TODO: Update this import to the existing `@/features/donations/api` module.
-import { getAllDonation } from "@/features/donation/api";
+import { getAllDonation } from "@/features/donations/api";
 
 export default function AdminDashboard() {
   const { data: pendingRequests, isLoading: requestsLoading } = useCustomQuery({

@@ -1,12 +1,10 @@
-// TODO: Update these imports to `@/features/donations/...`.
-import DonationForm from "@/features/donation/components/DonationForm";
-// TODO: The existing skeleton file is named `DonationsPageSkeleton.tsx`.
-import DonationPageSkeleton from "@/features/donation/components/DonationPageSkeleton";
-import ImpactSidebar from "@/features/donation/components/ImpactSidebar";
+import DonationForm from "@/features/donations/components/DonationForm";
+import DonationsPageSkeleton from "@/features/donations/components/DonationsPageSkeleton";
+import ImpactSidebar from "@/features/donations/components/ImpactSidebar";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 
-export const Route = createFileRoute("/(features)/donation")({
+export const Route = createFileRoute("/(features)/donations")({
   component: DonationPage,
 });
 
@@ -19,7 +17,7 @@ function DonationPage() {
   }, []);
 
   if (isLoading) {
-    return <DonationPageSkeleton />;
+    return <DonationsPageSkeleton />;
   }
 
   return (

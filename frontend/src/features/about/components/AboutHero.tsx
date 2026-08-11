@@ -13,7 +13,7 @@ export default function AboutHero() {
           dedicated to providing a safe and nurturing home for every child.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mt-4">
-          <Link to="/donation">
+          <Link to="/donations">
             <Button className="bg-[#6366F1] hover:bg-[#5558E3] text-white font-bold py-6 px-8 text-lg rounded-xl shadow-lg w-full sm:w-auto">
               Donate Now
             </Button>

@@ -9,8 +9,7 @@ import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 import { useAuthStore } from "@/store/auth-store";
 import useCustomMutation from "@/hooks/useCustomMutation";
-// TODO: Update this import to `@/features/donations/api`.
-import { createDonation } from "@/features/donation/api";
+import { createDonation } from "@/features/donations/api";
 
 const PRESET_AMOUNTS = [25, 50, 100];
 const GOODS_TYPES = ["Food", "Cloth", "Books"] as const;

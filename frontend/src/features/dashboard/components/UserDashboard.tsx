@@ -2,8 +2,7 @@ import type { ReactNode } from "react";
 import { Link } from "@tanstack/react-router";
 import useCustomQuery from "@/hooks/useCustomQuery";
 import { getMyReports } from "@/features/reports/api";
-// TODO: Update this import to the existing `@/features/donations/api` module.
-import { getMyDonation } from "@/features/donation/api";
+import { getMyDonation } from "@/features/donations/api";
 import { getMyAdoptionRequests } from "@/features/adoption/api";
 
 export default function UserDashboard() {
