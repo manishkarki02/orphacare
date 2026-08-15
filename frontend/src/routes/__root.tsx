@@ -16,7 +16,7 @@ function RootLayout() {
 
   useEffect(() => {
     init();
-  }, []);
+  }, [init]);
 
   return (
     <main className="content-grid bg-bg-body font-sans text-text-dark min-h-screen grid-rows-[auto_1fr_auto]">
