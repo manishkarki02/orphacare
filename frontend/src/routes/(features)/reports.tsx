@@ -5,7 +5,7 @@ import ReportCardSkeleton from "@/features/reports/components/ReportCardSkeleton
 import { getReports } from "@/features/reports/api";
 import useCustomQuery from "@/hooks/useCustomQuery";
 import { createFileRoute } from "@tanstack/react-router";
-import { Calendar, MapPin, Plus, Upload, X } from "lucide-react";
+import { Calendar, MapPin, Plus, Upload } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 
@@ -50,17 +50,12 @@ function ReportsPage() {
             ))}
       </div>
 
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}>
+      <Modal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title="Report a Missing Child"
+      >
         <div className="p-6 md:p-8 w-full max-w-lg mx-auto bg-white dark:bg-bg-card rounded-2xl relative">
-            <button 
-                onClick={() => setIsModalOpen(false)}
-                className="absolute top-4 right-4 text-text-muted hover:text-text-dark transition-colors"
-            >
-                <X size={24} />
-            </button>
-            
-            <h2 className="text-2xl font-bold text-text-dark mb-6">Report a Missing Child</h2>
-            
             <form className="space-y-4">
                 <div className="space-y-2">
                     <label className="text-sm font-bold text-text-dark">Child's Name</label>
