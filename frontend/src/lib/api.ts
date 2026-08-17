@@ -12,6 +12,21 @@ export const api = axios.create({
   },
 });
 
+interface ApiErrorResponse {
+  message?: unknown;
+}
+
+export function getApiErrorMessage(error: unknown, fallback: string) {
+  if (
+    axios.isAxiosError<ApiErrorResponse>(error) &&
+    typeof error.response?.data?.message === "string"
+  ) {
+    return error.response.data.message;
+  }
+
+  return fallback;
+}
+
 // Request Interceptor: Attach Token
 api.interceptors.request.use(
   (config) => {

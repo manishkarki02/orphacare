@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api";
+import { api, getApiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -47,7 +47,7 @@ export const ResetPasswordForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ResetPasswordValues>({
-    resolver: zodResolver(resetPasswordSchema as any),
+    resolver: zodResolver(resetPasswordSchema),
     defaultValues: {
       password: "",
       confirmPassword: "",
@@ -69,10 +69,9 @@ export const ResetPasswordForm = () => {
         confirmNewPassword: data.confirmPassword,
       });
       toast.success("Password reset successfully. Please sign in.");
-      navigate({ to: "/signin" });
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Failed to reset password";
+      navigate({ to: "/sign-in" });
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(error, "Failed to reset password");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -86,7 +85,7 @@ export const ResetPasswordForm = () => {
           Invalid Request: Missing Token
         </CardContent>
         <CardFooter className="justify-center hover:underline">
-          <Link to="/signin">Back to Sign In</Link>
+          <Link to="/sign-in">Back to Sign In</Link>
         </CardFooter>
       </Card>
     );
@@ -134,7 +133,7 @@ export const ResetPasswordForm = () => {
             {isLoading ? "Resetting..." : "Reset Password"}
           </Button>
           <div className="text-center text-sm">
-            <Link to="/signin" className="underline">
+            <Link to="/sign-in" className="underline">
               Back to Sign In
             </Link>
           </div>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api";
+import { api, getApiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,7 +30,7 @@ export const ForgotPasswordForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<ForgotPasswordValues>({
-    resolver: zodResolver(forgotPasswordSchema as any),
+    resolver: zodResolver(forgotPasswordSchema),
     defaultValues: {
       email: "",
     },
@@ -42,9 +42,8 @@ export const ForgotPasswordForm = () => {
       await api.post("/auth/forgot-password", data);
       toast.success("Password reset link sent to your email.");
       // In real app, we might redirect or just show success
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Failed to send reset link";
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(error, "Failed to send reset link");
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -82,7 +81,7 @@ export const ForgotPasswordForm = () => {
           </Button>
           <div className="text-center text-sm">
             Remember your password?{" "}
-            <Link to="/signin" className="underline">
+            <Link to="/sign-in" className="underline">
               Sign in
             </Link>
           </div>

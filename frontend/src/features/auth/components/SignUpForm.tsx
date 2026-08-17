@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { api } from "@/lib/api";
+import { api, getApiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -43,7 +43,7 @@ export const SignUpForm = () => {
     handleSubmit,
     formState: { errors },
   } = useForm<SignUpValues>({
-    resolver: zodResolver(signUpSchema as any),
+    resolver: zodResolver(signUpSchema),
     defaultValues: {
       name: "",
       email: "",
@@ -60,9 +60,8 @@ export const SignUpForm = () => {
       const response = await api.post("/auth/signup", data);
       toast.success(response.data.message || "Account created successfully. Please check your email.");
       navigate({ to: "/sign-in" }); // Using sign-in route instead of signin
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Failed to create account";
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(error, "Failed to create account");
       toast.error(message);
     } finally {
       setIsLoading(false);

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useAuthStore } from "@/store/auth-store";
-import { api } from "@/lib/api";
+import { api, getApiErrorMessage } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,7 +31,7 @@ export const SignInForm = () => {
     getValues,
     formState: { errors },
   } = useForm<SignInValues>({
-    resolver: zodResolver(signInSchema as any),
+    resolver: zodResolver(signInSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -49,9 +49,10 @@ export const SignInForm = () => {
       try {
           await api.get(`/auth/resend-verification?email=${email}`);
           toast.success("Verification email sent successfully.");
-      } catch (error: any) {
-           console.error(error);
-           toast.error(error.response?.data?.message || "Failed to resend verification email.");
+      } catch (error: unknown) {
+           toast.error(
+             getApiErrorMessage(error, "Failed to resend verification email.")
+           );
       } finally {
           setIsLoading(false);
       }
@@ -71,9 +72,8 @@ export const SignInForm = () => {
       
       toast.success("Signed in successfully");
       navigate({ to: "/dashboard" });
-    } catch (error: any) {
-      console.error(error);
-      const message = error.response?.data?.message || "Failed to sign in";
+    } catch (error: unknown) {
+      const message = getApiErrorMessage(error, "Failed to sign in");
       toast.error(message);
       
       if (message.includes("not verified")) {
