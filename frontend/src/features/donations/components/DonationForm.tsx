@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Link } from "@tanstack/react-router";
@@ -53,14 +53,14 @@ export default function DonationForm() {
     handleSubmit,
     setValue,
     reset,
-    watch,
     formState: { errors },
   } = useForm<DonationValues>({
     resolver: zodResolver(donationchema),
     defaultValues: { type: "Money", amount: 50 },
   });
 
-  const selectedType = watch("type");
+  const selectedType = useWatch({ control, name: "type" });
+  const selectedAmount = useWatch({ control, name: "amount" });
 
   const { mutate: donate, isPending } = useCustomMutation({
     api: createDonation,
@@ -147,7 +147,7 @@ export default function DonationForm() {
                   }
                   className={cn(
                     "py-3 rounded-lg text-sm font-bold transition-all border",
-                    watch("amount") === amount
+                    selectedAmount === amount
                       ? "bg-white border-[#6366F1] text-[#6366F1] shadow-sm"
                       : "bg-gray-50 dark:bg-gray-800 border-transparent text-text-muted hover:bg-gray-100 dark:hover:bg-gray-700",
                   )}
